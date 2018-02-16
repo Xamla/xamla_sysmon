@@ -1,0 +1,2 @@
+Open a shell and run roslaunch test.launch
+Open another shell and run th run.lua

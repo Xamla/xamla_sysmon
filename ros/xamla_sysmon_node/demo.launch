@@ -1,0 +1,7 @@
+<launch>
+  <node name="xamla_sysmon" pkg="xamla_sysmon_node" type="xamla_sysmon_node" output="screen">
+    <rosparam command="load" file="demo.yaml" param="monitor_topics" />
+    <param name="publish_frequency" type="double" value="2.0" />
+    <param name="number_of_topics" type="double" value="2.0" />
+  </node>
+</launch>

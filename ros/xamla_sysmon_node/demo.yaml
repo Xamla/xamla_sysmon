@@ -1,0 +1,11 @@
+number_of_topics: 2.0
+
+topic1:
+  name: "/ximea_mono/heartbeat"
+  type: "heartbeat"
+  timeout: 2.0
+
+topic2:
+  name: "/robot/ur5/heartbeat"
+  type: "heartbeat"
+  timeout: 2.5
