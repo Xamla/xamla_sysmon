@@ -2,23 +2,33 @@
 
 xamla_sysmon_client::xamla_sysmon_client()
 {
+  this->is_start_called = false;
+  this->stop_heartbeat = false;
 }
 
-void xamla_sysmon_client::start(ros::NodeHandle &node, int freq) {
-  //TODO check if already called
+void xamla_sysmon_client::start(ros::NodeHandle &node, unsigned int freq) {
+  if (this->is_start_called == false)
+    this->is_start_called = true;
+  else //if (this->is_start_called == true)
+  {
+    ROS_WARN("Heartbeat: start already called once, nothing to do");
+    return;
+  }
+
   this->node= node;
 
-  if(freq > 0)
+  //checking for +ve frequency
+  if(freq != 0)
     this->freq = freq;
   else
   {
     this->freq = 10;
-    ROS_WARN("heatbeat freq cannot be 0 or less; default to 10");
+    ROS_WARN("heatbeat freq cannot be 0");
   }
   ROS_INFO("[Heartbeat] publishing frequency: %d", this->freq);
 
   this->heartbeat_msg.header.stamp = ros::Time::now();
-  this->heartbeat_msg.status = GO;
+  this->heartbeat_msg.status = (int)TopicHeartbeatStatus::TopicCode::GO;
   this->heartbeat_msg.details = "Node starting";
 
   //openning new thread to publish state
@@ -27,7 +37,6 @@ void xamla_sysmon_client::start(ros::NodeHandle &node, int freq) {
 
 void xamla_sysmon_client::publish_status()
 {
-  //TODO add mutex to guard thread
   //ros publisher
   ROS_INFO("starting heartbeat publishing loop");
   ros::Publisher status_pub = this->node.advertise<xamla_sysmon_msgs::HeartBeat>(ros::this_node::getName()+"/heartbeat", 100);
@@ -35,21 +44,41 @@ void xamla_sysmon_client::publish_status()
 
   while(ros::ok())
   {
-    status_pub.publish(this->heartbeat_msg);
+    //if shutdown was called
+    if (this->stop_heartbeat == true)
+    {
+      break;
+    }
+
+    {
+      //thread lock guard
+      std::mutex my_mutex;
+      std::lock_guard<std::mutex> lock(my_mutex);
+      status_pub.publish(this->heartbeat_msg);
+    }
     //ROS_INFO("published a heartbeat");
     ros::spinOnce();
     loop_rate.sleep();
   }
+  //shutting down
+  //publisher gets out of scope and terminate no need to shut it down
+  ROS_INFO("Heartbeat: stopping heartbeat");
 }
 
 void xamla_sysmon_client::shutdown()
 {
-  //TODO shutdown the thread here
+  if (this->is_start_called == true)
+    this->stop_heartbeat = true;
+  else //(this->is_start_called == false)
+    ROS_WARN("Heartbeat wasn't running");
 }
 
-int32_t xamla_sysmon_client::updateStatus(heartbeat_status new_status, std::string details)
+void xamla_sysmon_client::updateStatus(TopicHeartbeatStatus::TopicCode new_status, std::string details)
 {
-  //TODO check if status is null or change it to type safe
-  this->heartbeat_msg.status = new_status;
+  //lock guard
+  std::mutex my_mutex;
+  std::lock_guard<std::mutex> lock(my_mutex);
+  //setting heartbeat msg fields
+  this->heartbeat_msg.status = (int)new_status;
   this->heartbeat_msg.details = details;
 }
