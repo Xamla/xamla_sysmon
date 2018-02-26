@@ -9,6 +9,7 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  std_msgs
   xamla_sysmon_msgs
 )
 
@@ -103,9 +104,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES xamla_sysmon_client
- CATKIN_DEPENDS roscpp xamla_sysmon_msgs
- DEPENDS system_lib
+ LIBRARIES ${PROJECT_NAME}
+ CATKIN_DEPENDS roscpp std_msgs xamla_sysmon_msgs
+# DEPENDS system_lib
 )
 
 ###########
@@ -120,7 +121,10 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(xamla_sysmon_client src/xamla_sysmon_client.cpp)
+add_library(${PROJECT_NAME} src/xamla_sysmon_client.cpp)
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/xamla_sysmon_client.cpp
 # )
@@ -150,6 +154,10 @@ add_library(xamla_sysmon_client src/xamla_sysmon_client.cpp)
 #   ${catkin_LIBRARIES}
 # )
 
+add_executable(talker_tester src/examples/talker.cpp)
+#target_link_libraries(talker ${catkin_LIBRARIES})
+target_link_libraries(talker_tester ${PROJECT_NAME} ${catkin_LIBRARIES})
+
 #############
 ## Install ##
 #############
@@ -165,11 +173,11 @@ add_library(xamla_sysmon_client src/xamla_sysmon_client.cpp)
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/

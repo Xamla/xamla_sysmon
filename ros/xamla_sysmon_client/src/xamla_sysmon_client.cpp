@@ -55,8 +55,8 @@ void xamla_sysmon_client::publish_status()
       std::mutex my_mutex;
       std::lock_guard<std::mutex> lock(my_mutex);
       status_pub.publish(this->heartbeat_msg);
-    }
     //ROS_INFO("published a heartbeat");
+    }
     ros::spinOnce();
     loop_rate.sleep();
   }
