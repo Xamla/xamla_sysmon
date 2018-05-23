@@ -92,7 +92,7 @@ void xamla_sysmon_client::shutdown()
     ROS_WARN("Heartbeat wasn't running");
 }
 
-void xamla_sysmon_client::updateStatus(TopicHeartbeatStatus::TopicCode new_status, const std::string details)
+void xamla_sysmon_client::updateStatus(TopicHeartbeatStatus::TopicCode new_status, const std::string &details)
 {
   //lock guard
   std::mutex my_mutex;
