@@ -16,7 +16,7 @@ public:
   xamla_sysmon_client();
   void start(ros::NodeHandle &node, unsigned int freq, uint64_t timeout);
   void shutdown();
-  void updateStatus(TopicHeartbeatStatus::TopicCode new_status, const std::string details);
+  void updateStatus(TopicHeartbeatStatus::TopicCode new_status, const std::string& details);
 private:
   int freq;
   ros::NodeHandle node;
