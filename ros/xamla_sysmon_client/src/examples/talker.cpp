@@ -18,7 +18,7 @@ int main(int argc, char **argv)
   TopicHeartbeatStatus::TopicCode my_status;
   std::string my_details;
   xamla_sysmon_client heartbeat_client;
-  heartbeat_client.start(n, 12);  //passing node handle and specifying freq
+  heartbeat_client.start(n, 12, 900);  //passing node handle and specifying freq and max duration between status updates in milliseconds
   // ------------------------------------------------------------
 
   while (ros::ok())
