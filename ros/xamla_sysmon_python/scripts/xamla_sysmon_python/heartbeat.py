@@ -13,13 +13,6 @@ class HeartbeatCode(IntEnum):
     SECONDARY_ERROR = 400
     INVALID = -1
 
-class SystemCode(IntEnum):
-    GO = 0
-    SECONDARY_ERROR = 1
-    ERROR = 2
-    EMERGENCY_STOP = 4
-    UNKOWN_ERROR = 8
-
 class HeartbeatClient:
     def __init__(self):
         self.heartbeat_publisher = None
