@@ -8,14 +8,15 @@
 #include "string.h"
 #include "xamla_sysmon_msgs/statuscodes.h"
 #include "mutex"
+#include "chrono"
 
 class xamla_sysmon_client
 {
 public:
   xamla_sysmon_client();
-  void start(ros::NodeHandle &node, unsigned int freq);
+  void start(ros::NodeHandle &node, unsigned int freq, uint64_t timeout);
   void shutdown();
-  void updateStatus(TopicHeartbeatStatus::TopicCode new_status, std::string details);
+  void updateStatus(TopicHeartbeatStatus::TopicCode new_status, const std::string& details);
 private:
   int freq;
   ros::NodeHandle node;
@@ -23,6 +24,9 @@ private:
   bool stop_heartbeat;
   xamla_sysmon_msgs::HeartBeat heartbeat_msg;
   std::thread pub_thread;
+  std::chrono::high_resolution_clock::time_point last_update_time;
+  std::chrono::milliseconds max_non_update_duration;
+  size_t sequence_count;
   void publish_status();
 };
 

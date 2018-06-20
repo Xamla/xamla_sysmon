@@ -4,9 +4,10 @@ xamla_sysmon_client::xamla_sysmon_client()
 {
   this->is_start_called = false;
   this->stop_heartbeat = false;
+  last_update_time = std::chrono::high_resolution_clock::now();
 }
 
-void xamla_sysmon_client::start(ros::NodeHandle &node, unsigned int freq) {
+void xamla_sysmon_client::start(ros::NodeHandle &node, unsigned int freq, uint64_t timeout) {
   if (this->is_start_called == false)
     this->is_start_called = true;
   else //if (this->is_start_called == true)
@@ -27,8 +28,12 @@ void xamla_sysmon_client::start(ros::NodeHandle &node, unsigned int freq) {
   }
   ROS_INFO("[Heartbeat] publishing frequency: %d", this->freq);
 
+  this->sequence_count = 0;
+  this->max_non_update_duration = std::chrono::milliseconds(timeout);
+
+  this->heartbeat_msg.header.seq = sequence_count++;
   this->heartbeat_msg.header.stamp = ros::Time::now();
-  this->heartbeat_msg.status = (int)TopicHeartbeatStatus::TopicCode::GO;
+  this->heartbeat_msg.status = (int)TopicHeartbeatStatus::TopicCode::STARTING;
   this->heartbeat_msg.details = "Node starting";
 
   //openning new thread to publish state
@@ -50,9 +55,23 @@ void xamla_sysmon_client::publish_status()
       break;
     }
 
+    this->heartbeat_msg.header.seq = sequence_count++;
+    this->heartbeat_msg.header.stamp = ros::Time::now();
+
+    std::mutex my_mutex;
+    auto current_time = std::chrono::high_resolution_clock::now();
+    std::cout<<std::chrono::duration_cast<std::chrono::milliseconds>(current_time-last_update_time).count()<<std::endl;
+    if(std::chrono::duration_cast<std::chrono::milliseconds>(current_time-last_update_time).count() > max_non_update_duration.count() &&
+       this->heartbeat_msg.status != int(TopicHeartbeatStatus::TopicCode::STARTING))
+    {
+      std::lock_guard<std::mutex> lock(my_mutex);
+      this->heartbeat_msg.status = int(TopicHeartbeatStatus::TopicCode::INTERNAL_ERROR);
+      this->heartbeat_msg.details = "Watchdog: the duration between two updates was to long, error";
+      status_pub.publish(this->heartbeat_msg);
+    }
+    else
     {
       //thread lock guard
-      std::mutex my_mutex;
       std::lock_guard<std::mutex> lock(my_mutex);
       status_pub.publish(this->heartbeat_msg);
     //ROS_INFO("published a heartbeat");
@@ -73,7 +92,7 @@ void xamla_sysmon_client::shutdown()
     ROS_WARN("Heartbeat wasn't running");
 }
 
-void xamla_sysmon_client::updateStatus(TopicHeartbeatStatus::TopicCode new_status, std::string details)
+void xamla_sysmon_client::updateStatus(TopicHeartbeatStatus::TopicCode new_status, const std::string &details)
 {
   //lock guard
   std::mutex my_mutex;
@@ -81,4 +100,5 @@ void xamla_sysmon_client::updateStatus(TopicHeartbeatStatus::TopicCode new_statu
   //setting heartbeat msg fields
   this->heartbeat_msg.status = (int)new_status;
   this->heartbeat_msg.details = details;
+  last_update_time = std::chrono::high_resolution_clock::now();
 }
