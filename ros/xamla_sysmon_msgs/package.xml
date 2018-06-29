@@ -1,6 +1,6 @@
 <package>
   <name>xamla_sysmon_msgs</name>
-  <version>1.0.0</version>
+  <version>0.1.0</version>
   <description>The Xamla System Monitor Message package</description>
   <maintainer email="info@xamla.com">Xamla</maintainer>
   <license>BSD</license>

@@ -10,7 +10,7 @@ description = {
   detailed = [[
   ]],
   homepage = "",
-  license = "proprietary"
+  license = "BSD"
 }
 
 dependencies = {

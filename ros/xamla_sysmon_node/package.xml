@@ -1,6 +1,6 @@
 <package>
   <name>xamla_sysmon_node</name>
-  <version>1.0.0</version>
+  <version>0.1.0</version>
   <description>Xamla System Monitor Node. Watches a configurable list of topics and publishes a global health state of the system.</description>
   <maintainer email="info@xamla.com">Xamla</maintainer>
   <license>BSD</license>

@@ -1,6 +1,6 @@
 <package>
   <name>xamla_sysmon_watch</name>
-  <version>1.0.0</version>
+  <version>0.1.0</version>
   <description>Xamla System Monitor Watch. Provides easy access to the global system state.</description>
   <maintainer email="info@xamla.com">Xamla</maintainer>
   <license>BSD</license>

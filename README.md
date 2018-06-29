@@ -1,6 +1,10 @@
+<img alt="Rosvita Beta Logo" src="./rosvita-beta.svg" width="400"/>
+
+This software is part of Rosvita Beta, the easiest and fastest way to get started with robot programming and ROS. You are free to use the Xamla system monitor in your own projects, but we recommend to have a look at the Rosvita IDE, where everything is already set up and you can start in no time. Check it out, it's free for personal usage.
+
 # Xamla ROS Sysmon
 
-Xamla ROS Sysmon monitors ROS topics and publishes a global system state depending of the state of the topics. For regular ROS topics it monitors the update frequency of the topic and will go into a fail state whenever a configurable threshold is reached. For a finer control of system state it is recommended to make use if Xamla ROS Heartbeat, which is a convention on top of regular ROS topics.
+Xamla ROS Sysmon monitors ROS topics and publishes a global system state depending of the state of the topics. For regular ROS topics it monitors the update frequency of the topic and will go into a fail state whenever a configurable threshold is reached. For a finer control of system state it is recommended to make use of Xamla ROS Heartbeat, which is a convention on top of regular ROS topics.
 
 ## Xamla ROS Heartbeat
 To use Xamla ROS Heartbeat a node shall publish a topic called 'heartbeat' within its namespace. It is within the responsibility of the node to update the heartbeat with the frequency configured in Xamla ROS Sysmon. If the timeout threshold is reached the node is considered as faulty and the global system state will go into fail state. The following states are available for heartbeats:
@@ -63,6 +67,6 @@ The global system is published on `/xamla_sysmon/system_status` and is an aggreg
 |SECONDARY\_ERROR <br /> first bit (1)|At least one monitored topic is in SECONDARY\_ERROR state. |
 |ERROR <br /> second bit (2)|At least on monitored topic is either in INTERNAL_ERROR state or the latest update is to long ago (timed out)|
 |EMERGENCY\_STOP <br /> third bit (4) | At least on monitored topic is in EMERGENCY_STOP state.|
-|UNKOWN\_ERROR <br /> fourth bit (8)| At least on monitored topic is an unkown state.|
+|UNKOWN\_ERROR <br /> fourth bit (8)| At least on monitored topic is in an unkown state.|
 
 It is possible that the global state encodes several of the above states. Consider the example where one node goes in ERROR state and a dependend node goes into SECONDARY_ERROR state. In this case the global state would have the second and first bit set, which would be 3 interpreted as integer.
