@@ -59,7 +59,7 @@ class HeartbeatClient:
             self.timeout = 4.0/self.frequency
             self.timeout = max(1.0, self.timeout)
         else:  
-            self.timeout = float(1/self.frequency)
+            self.timeout = float(timeout)
         self.heartbeat_publisher = rospy.Publisher(rospy.get_name() + '/heartbeat', HeartBeat, queue_size=10)
         self.msg.status = HeartbeatCode.STARTING
         self.msg.details = "STARTING"
