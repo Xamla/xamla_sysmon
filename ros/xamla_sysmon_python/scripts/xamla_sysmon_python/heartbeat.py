@@ -35,6 +35,7 @@ from xamla_sysmon_msgs.msg import HeartBeat
 from enum import IntEnum
 from threading import Lock
 import thread
+import math
 
 class HeartbeatCode(IntEnum):
     GO = 0
@@ -51,10 +52,14 @@ class HeartbeatClient:
         self.mutex = Lock()
         self.msg = HeartBeat()
 
-    def start(self, frequency):
+    def start(self, frequency, timeout=None):
         self.frequency = float(frequency)
         self.rate = rospy.Rate(frequency)
-        self.timeout = float(1/self.frequency)
+        if timeout is None:
+            self.timeout = 4.0/self.frequency
+            self.timeout = max(1.0, self.timeout)
+        else:  
+            self.timeout = float(1/self.frequency)
         self.heartbeat_publisher = rospy.Publisher(rospy.get_name() + '/heartbeat', HeartBeat, queue_size=10)
         self.msg.status = HeartbeatCode.STARTING
         self.msg.details = "STARTING"
